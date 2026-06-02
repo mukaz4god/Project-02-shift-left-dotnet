@@ -1,0 +1,11 @@
+services:
+  dotnet-vulnerable-app:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    container_name: dotnet-vulnerable-app
+    ports:
+      - "8080:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:8080
