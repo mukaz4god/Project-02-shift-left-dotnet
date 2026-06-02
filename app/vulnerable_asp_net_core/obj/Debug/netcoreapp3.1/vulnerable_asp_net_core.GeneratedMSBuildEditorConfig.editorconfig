@@ -1,0 +1,8 @@
+is_global = true
+build_property.RootNamespace = vulnerable_asp_net_core
+build_property.ProjectDir = c:\Users\mukaz\OneDrive\Documents\Learning Resources\SecurityProject\project-02-shiftleft-dotnet\app\vulnerable_asp_net_core\
+build_property.EnableComHosting = 
+build_property.EnableGeneratedComInterfaceComImportInterop = 
+build_property.CsWinRTUseWindowsUIXamlProjections = false
+build_property.EffectiveAnalysisLevelStyle = 
+build_property.EnableCodeStyleSeverity = 
