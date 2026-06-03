@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "lOdCtGkX5pg=",
+  "dgSpecHash": "NKh+w9amtGA=",
   "success": true,
-  "projectFilePath": "c:\\Users\\mukaz\\OneDrive\\Documents\\Learning Resources\\SecurityProject\\project-02-shiftleft-dotnet\\app\\vulnerable_asp_net_core\\vulnerable_asp_net_core.csproj",
+  "projectFilePath": "C:\\Users\\mukaz\\OneDrive\\Documents\\Learning Resources\\SecurityProject\\project-02-shiftleft-dotnet\\app\\vulnerable_asp_net_core\\vulnerable_asp_net_core.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\mukaz\\.nuget\\packages\\entityframework\\6.4.4\\entityframework.6.4.4.nupkg.sha512",
     "C:\\Users\\mukaz\\.nuget\\packages\\log4net\\2.0.8\\log4net.2.0.8.nupkg.sha512",
