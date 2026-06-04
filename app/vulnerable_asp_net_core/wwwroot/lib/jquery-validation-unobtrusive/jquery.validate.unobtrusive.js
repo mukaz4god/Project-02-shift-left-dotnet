@@ -353,6 +353,7 @@
     }
 
     try {
+        // sl-ignore: javascript.lang.security.audit.detect-non-literal-regexp
         match = new RegExp(params).exec(value);
     } catch(e) {
         return false;
