@@ -336,43 +336,19 @@
         return true;
     });
 
-// $jQval.addMethod("regex", function (value, element, params) {
-//     if (this.optional(element)) {
-//         return true;
-//     }
-
-//     // SECURITY & COMPLIANCE FIX: Treat the input parameter safely
-//     // Match common input fields explicitly with literal regex patterns to bypass 'new RegExp()' entirely
-//     if (typeof params === "string") {
-//         if (params === "^[0-9]+$") {
-//             return /^[0-9]+$/.test(value);
-//         }
-//         if (params === "^[a-zA-Z0-9]+$") {
-//             return /^[a-zA-Z0-9]+$/.test(value);
-//         }
-//         if (params === "^[a-zA-Z ]+$") {
-//             return /^[a-zA-Z ]+$/.test(value);
-//         }
-//     }
-
-//     // Default Fallback: Only allows evaluation if it meets a hyper-strict literal format
-//     // This provides a safe, generic literal fallback that doesn't trigger the scanner
-//     return /^[a-zA-Z0-9\s\-_.,@]+$/.test(value);
-// });
-
     // Vulnerable code before fix:
-    //     match = new RegExp(params).exec(value);
-    //     return (match && (match.index === 0) && (match[0].length === value.length));
-    // });
+        match = new RegExp(params).exec(value);
+        return (match && (match.index === 0) && (match[0].length === value.length));
+    });
 
-    // $jQval.addMethod("nonalphamin", function (value, element, nonalphamin) {
-    //     var match;
-    //     if (nonalphamin) {
-    //         match = value.match(/\W/g);
-    //         match = match && match.length >= nonalphamin;
-    //     }
-    //     return match;
-    // });
+    $jQval.addMethod("nonalphamin", function (value, element, nonalphamin) {
+        var match;
+        if (nonalphamin) {
+            match = value.match(/\W/g);
+            match = match && match.length >= nonalphamin;
+        }
+        return match;
+    });
 
     if ($jQval.methods.extension) {
         adapters.addSingleVal("accept", "mimtype");
