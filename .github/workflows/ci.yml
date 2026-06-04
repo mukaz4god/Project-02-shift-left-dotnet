@@ -19,6 +19,9 @@ jobs:
 
   codeQL-scan-analysis:
     uses: ./.github/workflows/codeql.yml
+    permissions:
+      actions: read
+      security-events: write
 
   dependency-check:
     uses: ./.github/workflows/dependency-check.yml
