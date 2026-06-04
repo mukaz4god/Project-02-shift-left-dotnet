@@ -1,0 +1,2 @@
+# Ignore third-party JavaScript libraries
+app/vulnerable_asp_net_core/wwwroot/lib/**
