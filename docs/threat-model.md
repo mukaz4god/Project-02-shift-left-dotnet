@@ -2,7 +2,7 @@
 
 ## Overview
 
-This project assesses and secures a vulnerable ASP.NET Core application.
+This project will assess and secures a vulnerable ASP.NET Core application.
 
 The objective is to integrate DevSecOps controls and validate security improvements through testing and automation.
 
@@ -84,13 +84,13 @@ Automated deployments interact with cloud resources.
 
 ---
 
-## Planned Security Controls
+## Planned Security Controls To Be Considered
 
-- Semgrep
-- Gitleaks
-- OWASP Dependency Check
-- Trivy
-- OWASP ZAP
-- DefectDojo
-- Terraform
-- AWS Security Controls
+- SAST: Semgrep, SonarQube, Veracode, Snyk, Checkmarx, or Fortify
+- Secrets Scanning: Gitleaks
+- SCA: OWASP Dependency-Check, Snyk Open Source, Veracode SCA, or Checkmarx SCA
+- Container Security: Trivy
+- DAST: OWASP ZAP, Invicti, Burp Enterprise, Checkmarx, Fortify, Snyk
+- Findings Management: DefectDojo
+- IaC Security: Checkov, Trivy, or tfsec (for Terraform code)
+- AWS Security Controls: AWS Security Hub, GuardDuty, CloudTrail, CloudWatch, AWS Config

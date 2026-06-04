@@ -8,7 +8,7 @@ This is a vulnerable ASP .net core application that implements all vulnerabiliti
 
 ## Key Functionality
 
-At the moment, we have implemented the following vulnerabilities.
+At the moment, the application have implemented the following vulnerabilities.
 
 ### A1 -Injection
 - [x] SQL Injection
