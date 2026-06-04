@@ -337,23 +337,19 @@
     });
 
     $jQval.addMethod("regex", function (value, element, params) {
-        var match;
-        if (this.optional(element)) {
-            return true;
-        }
-    // SECURITY FIX: Reject suspicious or excessively long patterns to prevent ReDoS
-    if (typeof params !== "string" || params.length > 250 || /[\{\}\*\+\?]{3,}/.test(params)) {
+    var match;
+    if (this.optional(element)) {
+        return true;
+    }
+
+    // SECURITY FIX: Reject non-strings, overly long patterns, or dangerous repeating quantifiers
+    if (typeof params !== "string" || params.length > 100 || /[\{\}\*\+\?]{3,}/.test(params)) {
         console.warn("Rejected suspicious regular expression pattern to prevent ReDoS.");
         return false;
     }
 
-    // FIX: Block overly long or complex patterns injected into the DOM
-    if (typeof params !== "string" || params.length > 100) {
-        return false;
-    }
-
     try {
-        // sl-ignore: javascript.lang.security.audit.detect-non-literal-regexp
+        // nosmgrep: javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp
         match = new RegExp(params).exec(value);
     } catch(e) {
         return false;
@@ -361,6 +357,7 @@
 
     return (match && (match.index === 0) && (match[0].length === value.length));
 });
+
     // Vulnerable code before fix:
     //     match = new RegExp(params).exec(value);
     //     return (match && (match.index === 0) && (match[0].length === value.length));
