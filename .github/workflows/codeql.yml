@@ -4,9 +4,8 @@ on:
   workflow_call:
 
 jobs:
-  analyze:
-    name: Analyze
 
+  CodeQL-scan-analysis:
     runs-on: ubuntu-latest
 
     permissions:
