@@ -13,5 +13,9 @@ jobs:
 
   sast-scan:
     uses: ./.github/workflows/sast.yml
-  scret-scan:
+
+  secret-scan:
     uses: ./.github/workflows/secret-scan.yml
+
+  codeQL-scan-analysis:
+    uses: ./.github/workflows/codeql.yml

@@ -2,7 +2,7 @@ name: SAST Pipeline (Semgrep)
 
 on:
   workflow_call:
-    
+
 jobs:
   semgrep:
     runs-on: ubuntu-latest
@@ -16,4 +16,3 @@ jobs:
         uses: returntocorp/semgrep-action@v1
         with:
           config: auto
-
