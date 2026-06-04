@@ -347,10 +347,15 @@
         return false;
     }
 
+    // FIX: Block overly long or complex patterns injected into the DOM
+    if (typeof params !== "string" || params.length > 100) {
+        return false;
+    }
+
     try {
         match = new RegExp(params).exec(value);
-    } catch (e) {
-        return false; // Fail gracefully if regex is invalid
+    } catch(e) {
+        return false;
     }
 
     return (match && (match.index === 0) && (match[0].length === value.length));
