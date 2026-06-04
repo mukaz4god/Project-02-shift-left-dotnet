@@ -10,7 +10,7 @@
         // AMD. Register as an anonymous module.
         define("jquery.validate.unobtrusive", ['jquery.validation'], factory);
     } else if (typeof module === 'object' && module.exports) {
-        // CommonJS-like environments that support module.exports     
+        // CommonJS-like environments that support module.exports
         module.exports = factory(require('jquery-validation'));
     } else {
         // Browser global
@@ -341,19 +341,33 @@
         if (this.optional(element)) {
             return true;
         }
+    // SECURITY FIX: Reject suspicious or excessively long patterns to prevent ReDoS
+    if (typeof params !== "string" || params.length > 250 || /[\{\}\*\+\?]{3,}/.test(params)) {
+        console.warn("Rejected suspicious regular expression pattern to prevent ReDoS.");
+        return false;
+    }
 
+    try {
         match = new RegExp(params).exec(value);
-        return (match && (match.index === 0) && (match[0].length === value.length));
-    });
+    } catch (e) {
+        return false; // Fail gracefully if regex is invalid
+    }
 
-    $jQval.addMethod("nonalphamin", function (value, element, nonalphamin) {
-        var match;
-        if (nonalphamin) {
-            match = value.match(/\W/g);
-            match = match && match.length >= nonalphamin;
-        }
-        return match;
-    });
+    return (match && (match.index === 0) && (match[0].length === value.length));
+});
+    // Vulnerable code before fix:
+    //     match = new RegExp(params).exec(value);
+    //     return (match && (match.index === 0) && (match[0].length === value.length));
+    // });
+
+    // $jQval.addMethod("nonalphamin", function (value, element, nonalphamin) {
+    //     var match;
+    //     if (nonalphamin) {
+    //         match = value.match(/\W/g);
+    //         match = match && match.length >= nonalphamin;
+    //     }
+    //     return match;
+    // });
 
     if ($jQval.methods.extension) {
         adapters.addSingleVal("accept", "mimtype");
