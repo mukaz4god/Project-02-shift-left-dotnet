@@ -1,0 +1,17 @@
+name: Security Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+  pull_request:
+    branches:
+      - main
+
+jobs:
+
+  sast-scan:
+    uses: ./.github/workflows/sast.yml
+  scret-scan:
+    uses: ./.github/workflows/secret-scan.yml
