@@ -32,3 +32,6 @@ jobs:
     permissions:
       contents: read
       security-events: write
+
+  sbom:
+    uses: ./.github/workflows/sbom.yml
