@@ -10,8 +10,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - uses: actions/checkout@v4
+      - name: Build Image
+        run: |
+          docker build -t vulnerable-dotnet-app:latest ./app
 
       - name: Generate SBOM
         uses: anchore/sbom-action@v0
