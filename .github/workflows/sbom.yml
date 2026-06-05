@@ -15,6 +15,9 @@ jobs:
 
       - name: Generate SBOM
         uses: anchore/sbom-action@v0
+        with:
+          image: vulnerable-dotnet-app:latest
+          formats: spdx-json
 
       - name: Upload SBOM
         uses: actions/upload-artifact@v4
