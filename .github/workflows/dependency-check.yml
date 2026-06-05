@@ -18,7 +18,7 @@ jobs:
         with:
           project: "project-02-shiftleft-dotnet"
           path: "./app"
-          format: "HTML"
+          format: "ALL"
 
       - name: Upload Report
         uses: actions/upload-artifact@v4
