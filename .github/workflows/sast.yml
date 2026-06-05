@@ -16,3 +16,10 @@ jobs:
         uses: returntocorp/semgrep-action@v1
         with:
           config: auto
+          format: sarif
+          output: semgrep-results.sarif
+
+      - name: Upload SARIF
+        uses: github/semgrep/upload-sarif@v1
+        with:
+          sarif_file: semgrep-results.sarif

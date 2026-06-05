@@ -26,3 +26,9 @@ jobs:
 
   dependency-check:
     uses: ./.github/workflows/dependency-check.yml
+
+  image-scan:
+    uses: ./.github/workflows/image-scan.yml
+    permissions:
+      contents: read
+      security-events: write
