@@ -1,4 +1,4 @@
-# Day 3 Baseline Findings
+# Baseline Findings
 
 ## Semgrep
 

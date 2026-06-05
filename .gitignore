@@ -1,1 +1,15 @@
 shiftleft-ngsast.yml
+.env
+*.log
+node_modules/
+bin/
+obj/
+.vs/
+.idea/
+*.user
+*.suo
+security/reports/
+.terraform/
+*.tfstate
+*.tfstate.*
+terraform.tfvars
