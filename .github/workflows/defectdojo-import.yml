@@ -57,3 +57,15 @@ jobs:
             -F "file=@trivy-results/trivy-results.json" \
             -F "active=true" \
             -F "verified=true"
+
+      - name: Import Semgrep into DefectDojo
+        if: hashFiles('semgrep-results/semgrep-results.json') != ''
+        run: |
+          curl -i -X POST \
+            "${{ secrets.DEFECTDOJO_URL }}/api/v2/import-scan/" \
+            -H "Authorization: Token ${{ secrets.DEFECTDOJO_API_KEY }}" \
+            -F "engagement=${{ secrets.DEFECTDOJO_ENGAGEMENT_ID }}" \
+            -F "scan_type=Semgrep Scan" \
+            -F "file=@semgrep-results/semgrep-results.json" \
+            -F "active=true" \
+            -F "verified=true"
