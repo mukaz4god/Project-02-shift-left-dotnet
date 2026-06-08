@@ -13,6 +13,38 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Run Semgrep
-        uses: returntocorp/semgrep-action@v1
+        run: |
+          docker run --rm \
+          -v "${{ github.workspace }}:/src" \
+          semgrep/semgrep \
+          semgrep scan \
+          --config auto \
+          --json \
+          --output semgrep-results.json \
+          /src
+
+      - name: Upload Semgrep Artifact
+        uses: actions/upload-artifact@v4
         with:
-          config: auto
+          name: semgrep-results
+          path: semgrep-results.json
+
+      - name: Download Semgrep artifact
+        uses: dawidd6/action-download-artifact@v6
+        continue-on-error: true
+        with:
+          workflow: security.yml
+          name: semgrep-results
+          path: semgrep-results
+
+      - name: Import Semgrep into DefectDojo
+        if: hashFiles('semgrep-results/semgrep-results.json') != ''
+        run: |
+          curl -X POST \
+            "${{ secrets.DEFECTDOJO_URL }}/api/v2/import-scan/" \
+            -H "Authorization: Token ${{ secrets.DEFECTDOJO_API_KEY }}" \
+            -F "engagement=${{ secrets.DEFECTDOJO_ENGAGEMENT_ID }}" \
+            -F "scan_type=Semgrep JSON Report" \
+            -F "file=@semgrep-results/semgrep-results.json" \
+            -F "active=true" \
+            -F "verified=true"
