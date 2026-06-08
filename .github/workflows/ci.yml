@@ -42,6 +42,9 @@ jobs:
       - sast-scan
       - dependency-check
       - image-scan
+      - sbom
+      - secret-scan
+      - codeQL-scan-analysis
     if: always()
 
     steps:
