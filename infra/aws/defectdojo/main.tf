@@ -17,7 +17,7 @@ resource "aws_security_group" "defectdojo_sg" {
     from_port   = 8080
     to_port     = 8080
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]#[var.allowed_admin_cidr]
+    cidr_blocks = [var.allowed_admin_cidr]
   }
 
   ingress {
