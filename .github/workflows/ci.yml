@@ -72,6 +72,13 @@ jobs:
       - name: Debug downloaded files
         run: find . -type f
 
+      - name: Verify DefectDojo secrets exist
+        run: |
+          test -n "${{ secrets.DEFECTDOJO_URL }}" || (echo "DEFECTDOJO_URL is missing" && exit 1)
+          test -n "${{ secrets.DEFECTDOJO_API_KEY }}" || (echo "DEFECTDOJO_API_KEY is missing" && exit 1)
+          test -n "${{ secrets.DEFECTDOJO_ENGAGEMENT_ID }}" || (echo "DEFECTDOJO_ENGAGEMENT_ID is missing" && exit 1)
+          echo "DefectDojo secrets are configured"
+
       - name: Import Semgrep into DefectDojo
         if: hashFiles('semgrep-results/semgrep-results.json') != ''
         run: |
