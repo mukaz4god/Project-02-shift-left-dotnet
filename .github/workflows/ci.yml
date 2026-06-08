@@ -90,6 +90,10 @@ jobs:
             -F "file=@semgrep-results/semgrep-results.json" \
             -F "active=true" \
             -F "verified=true"
+      - name: Debug Dependency Check Content
+        run: |
+          ls -la dependency-check-report
+          head -50 dependency-check-report/dependency-check-report.json
 
       - name: Import Dependency-Check into DefectDojo
         if: hashFiles('dependency-check-report/dependency-check-report.json') != ''
@@ -99,7 +103,7 @@ jobs:
             -H "Authorization: Token ${{ secrets.DEFECTDOJO_API_KEY }}" \
             -F "engagement=${{ secrets.DEFECTDOJO_ENGAGEMENT_ID }}" \
             -F "scan_type=Dependency Check Scan" \
-            -F "file=@dependency-check-report/dependency-check-report.json" \
+            -F "file=@dependency-check-report/dependency-check-report.xml" \
             -F "active=true" \
             -F "verified=true"
 
