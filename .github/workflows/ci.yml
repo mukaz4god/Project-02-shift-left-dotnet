@@ -39,12 +39,9 @@ jobs:
   defectdojo-import:
     runs-on: ubuntu-latest
     needs:
-      - sast
+      - sast-scan
       - dependency-check
       - image-scan
-      - secret-scan
-      - codeql
-      - sbom
     if: always()
 
     steps:
@@ -53,23 +50,27 @@ jobs:
         with:
           name: semgrep-results
           path: semgrep-results
+        continue-on-error: true
 
       - name: Download Dependency-Check artifact
         uses: actions/download-artifact@v4
         with:
           name: dependency-check-report
           path: dependency-check-report
+        continue-on-error: true
 
       - name: Download Trivy artifact
         uses: actions/download-artifact@v4
         with:
           name: trivy-results
           path: trivy-results
+        continue-on-error: true
 
       - name: Debug downloaded files
         run: find . -type f
 
       - name: Import Semgrep into DefectDojo
+        if: hashFiles('semgrep-results/semgrep-results.json') != ''
         run: |
           curl -i -X POST \
             "${{ secrets.DEFECTDOJO_URL }}/api/v2/import-scan/" \
@@ -81,6 +82,7 @@ jobs:
             -F "verified=true"
 
       - name: Import Dependency-Check into DefectDojo
+        if: hashFiles('dependency-check-report/dependency-check-report.json') != ''
         run: |
           curl -i -X POST \
             "${{ secrets.DEFECTDOJO_URL }}/api/v2/import-scan/" \
@@ -92,6 +94,7 @@ jobs:
             -F "verified=true"
 
       - name: Import Trivy into DefectDojo
+        if: hashFiles('trivy-results/trivy-results.json') != ''
         run: |
           curl -i -X POST \
             "${{ secrets.DEFECTDOJO_URL }}/api/v2/import-scan/" \
