@@ -29,6 +29,11 @@ jobs:
           name: trivy-results
           path: trivy-results
 
+      - name: Debug downloaded files
+        run: |
+          pwd
+          find . -type f
+
       - name: Import Dependency-Check into DefectDojo
         if: hashFiles('dependency-check-report/dependency-check-report.json') != ''
         run: |
