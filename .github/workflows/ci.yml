@@ -35,3 +35,6 @@ jobs:
 
   sbom:
     uses: ./.github/workflows/sbom.yml
+
+  defectdojo-import:
+    uses: ./.github/workflows/defectdojo-import.yml
