@@ -4,7 +4,7 @@ on:
   workflow_run:
     workflows:
       - Dependency Check
-      - Container Security
+      - Image Scan Pipeline(Trivy)
     types:
       - completed
 

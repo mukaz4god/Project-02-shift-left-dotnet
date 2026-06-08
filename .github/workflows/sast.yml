@@ -21,7 +21,7 @@ jobs:
           --config auto \
           --json \
           --output semgrep-results.json \
-          /src
+          /src/app
 
       - name: Upload Semgrep Artifact
         uses: actions/upload-artifact@v4
