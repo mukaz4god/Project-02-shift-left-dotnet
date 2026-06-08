@@ -13,3 +13,4 @@ security/reports/
 *.tfstate
 *.tfstate.*
 terraform.tfvars
+infra/aws/defectdojo/terraform.tfvars
