@@ -1,7 +1,11 @@
 name: AWS Environment Promotion
 
 on:
-  workflow_dispatch:
+#workflow_dispatch:
+  workflow_call:
+    workflows: ["CI"]
+    types:
+      - completed
 
 permissions:
   id-token: write
