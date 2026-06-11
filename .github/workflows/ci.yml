@@ -83,10 +83,9 @@ jobs:
         if: hashFiles('semgrep-results/semgrep-results.json') != ''
         run: |
           curl -i -X POST \
-            "${{ secrets.DEFECTDOJO_URL }}/api/v2/reimport-scan/" \
+            "${{ secrets.DEFECTDOJO_URL }}/api/v2/import-scan/" \
             -H "Authorization: Token ${{ secrets.DEFECTDOJO_API_KEY }}" \
-            -F "product_name=Project 2 - OWASP .NET App" \
-            -F "engagement_name=Shift-Left Security Assessment" \
+            -F "engagement=${{ secrets.DEFECTDOJO_ENGAGEMENT_ID }}" \
             -F "scan_type=Semgrep JSON Report" \
             -F "file=@semgrep-results/semgrep-results.json" \
             -F "active=true" \
@@ -101,10 +100,9 @@ jobs:
         if: hashFiles('dependency-check-report/dependency-check-report.json') != ''
         run: |
           curl -i -X POST \
-            "${{ secrets.DEFECTDOJO_URL }}/api/v2/reimport-scan/" \
+            "${{ secrets.DEFECTDOJO_URL }}/api/v2/import-scan/" \
             -H "Authorization: Token ${{ secrets.DEFECTDOJO_API_KEY }}" \
-            -F "product_name=Project 2 - OWASP .NET App" \
-            -F "engagement_name=Shift-Left Security Assessment" \
+            -F "engagement=${{ secrets.DEFECTDOJO_ENGAGEMENT_ID }}" \
             -F "scan_type=Dependency Check Scan" \
             -F "file=@dependency-check-report/dependency-check-report.xml" \
             -F "active=true" \
@@ -114,10 +112,9 @@ jobs:
         if: hashFiles('trivy-results/trivy-results.json') != ''
         run: |
           curl -i -X POST \
-            "${{ secrets.DEFECTDOJO_URL }}/api/v2/reimport-scan/" \
+            "${{ secrets.DEFECTDOJO_URL }}/api/v2/import-scan/" \
             -H "Authorization: Token ${{ secrets.DEFECTDOJO_API_KEY }}" \
-            -F "product_name=Project 2 - OWASP .NET App" \
-            -F "engagement_name=Shift-Left Security Assessment" \
+            -F "engagement=${{ secrets.DEFECTDOJO_ENGAGEMENT_ID }}" \
             -F "scan_type=Trivy Scan" \
             -F "file=@trivy-results/trivy-results.json" \
             -F "active=true" \
