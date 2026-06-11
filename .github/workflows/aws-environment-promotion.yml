@@ -1,0 +1,137 @@
+name: AWS Environment Promotion
+
+on:
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    outputs:
+      image_tag: ${{ github.sha }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials with OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Login to ECR
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build image
+        run: |
+          docker build -t vulnerable-dotnet-app:${{ github.sha }} ./app
+
+      - name: Tag image for ECR
+        run: |
+          docker tag vulnerable-dotnet-app:${{ github.sha }} ${{ secrets.ECR_REPOSITORY }}:${{ github.sha }}
+
+      - name: Push image to ECR
+        run: |
+          docker push ${{ secrets.ECR_REPOSITORY }}:${{ github.sha }}
+
+  deploy-dev:
+    runs-on: ubuntu-latest
+    needs: build-and-push
+    environment: dev
+
+    steps:
+      - name: Configure AWS credentials with OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Deploy Dev via SSM
+        run: |
+          aws ssm send-command \
+            --document-name "AWS-RunShellScript" \
+            --targets "Key=tag:Name,Values=project2-dotnet-dev" \
+            --parameters 'commands=[
+              "aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_REPOSITORY }}",
+              "docker pull ${{ secrets.ECR_REPOSITORY }}:${{ needs.build-and-push.outputs.image_tag }}",
+              "docker stop vulnerable-dotnet-app || true",
+              "docker rm vulnerable-dotnet-app || true",
+              "docker run -d --name vulnerable-dotnet-app --restart unless-stopped -p 8080:8080 ${{ secrets.ECR_REPOSITORY }}:${{ needs.build-and-push.outputs.image_tag }}"
+            ]' \
+            --region ${{ secrets.AWS_REGION }}
+
+      - name: Smoke Test Dev
+        run: |
+          sleep 30
+          curl -f http://${{ secrets.DEV_HOST }}:8080
+
+  deploy-test:
+    runs-on: ubuntu-latest
+    needs:
+      - build-and-push
+      - deploy-dev
+    environment: test
+
+    steps:
+      - name: Configure AWS credentials with OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Deploy Test via SSM
+        run: |
+          aws ssm send-command \
+            --document-name "AWS-RunShellScript" \
+            --targets "Key=tag:Name,Values=project2-dotnet-test" \
+            --parameters 'commands=[
+              "aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_REPOSITORY }}",
+              "docker pull ${{ secrets.ECR_REPOSITORY }}:${{ needs.build-and-push.outputs.image_tag }}",
+              "docker stop vulnerable-dotnet-app || true",
+              "docker rm vulnerable-dotnet-app || true",
+              "docker run -d --name vulnerable-dotnet-app --restart unless-stopped -p 8080:8080 ${{ secrets.ECR_REPOSITORY }}:${{ needs.build-and-push.outputs.image_tag }}"
+            ]' \
+            --region ${{ secrets.AWS_REGION }}
+
+      - name: Smoke Test Test
+        run: |
+          sleep 30
+          curl -f http://${{ secrets.TEST_HOST }}:8080
+
+  deploy-staging:
+    runs-on: ubuntu-latest
+    needs:
+      - build-and-push
+      - deploy-test
+    environment: staging
+
+    steps:
+      - name: Configure AWS credentials with OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Deploy Staging via SSM
+        run: |
+          aws ssm send-command \
+            --document-name "AWS-RunShellScript" \
+            --targets "Key=tag:Name,Values=project2-dotnet-staging" \
+            --parameters 'commands=[
+              "aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_REPOSITORY }}",
+              "docker pull ${{ secrets.ECR_REPOSITORY }}:${{ needs.build-and-push.outputs.image_tag }}",
+              "docker stop vulnerable-dotnet-app || true",
+              "docker rm vulnerable-dotnet-app || true",
+              "docker run -d --name vulnerable-dotnet-app --restart unless-stopped -p 8080:8080 ${{ secrets.ECR_REPOSITORY }}:${{ needs.build-and-push.outputs.image_tag }}"
+            ]' \
+            --region ${{ secrets.AWS_REGION }}
+
+      - name: Smoke Test Staging
+        run: |
+          sleep 30
+          curl -f http://${{ secrets.STAGING_HOST }}:8080
