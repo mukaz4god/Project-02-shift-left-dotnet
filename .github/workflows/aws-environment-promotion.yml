@@ -1,8 +1,12 @@
 name: AWS Environment Promotion
 
 on:
-#workflow_dispatch:
-  workflow_call:
+#workflow_dispatch: 👈 Keeps it run it manually from the Actions tab
+# workflow_call: 👈 Keeps it reusable by other files
+  workflow_run: # 👈 Use this if you want it to trigger on another workflow
+    workflows: ["CI Pipeline"]
+    types:
+      - completed
 
 permissions:
   id-token: write
