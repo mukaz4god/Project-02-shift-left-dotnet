@@ -22,8 +22,8 @@ resource "aws_ecr_repository" "app" {
   }
 }
 
-resource "aws_security_group" "app_sg" {
-  name        = "${var.project_name}-app-sg"
+resource "aws_security_group" "app_sgv2" {
+  name        = "${var.project_name}-app-sgv2"
   description = "Security group for Project 2 app environments"
 
   ingress {
@@ -125,7 +125,7 @@ resource "aws_instance" "app" {
   ami                    = data.aws_ami.amazon_linux.id
   instance_type          = "t3.micro"
   key_name               = var.key_name
-  vpc_security_group_ids = [aws_security_group.app_sg.id]
+  vpc_security_group_ids = [aws_security_group.app_sgv2.id]
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.name
 
   user_data = <<-EOF
@@ -146,7 +146,7 @@ resource "aws_instance" "app" {
   }
 
   root_block_device {
-    volume_size = 20
+    volume_size = 30
     volume_type = "gp3"
     encrypted   = true
   }
