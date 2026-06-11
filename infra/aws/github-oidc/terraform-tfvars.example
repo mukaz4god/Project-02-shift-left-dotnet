@@ -1,0 +1,3 @@
+aws_region   = "us-east-1"
+github_repo  = "mukaz4god/Project-02-shift-left-dotnet"
+project_name = "project2-dotnet"

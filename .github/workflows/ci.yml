@@ -45,7 +45,7 @@ jobs:
       - sbom
       - secret-scan
       - codeQL-scan-analysis
-    if: always()
+    if: always() # Ensure this job runs even if previous jobs fail
 
     steps:
       - name: Download Semgrep artifact

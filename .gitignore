@@ -14,3 +14,7 @@ security/reports/
 *.tfstate.*
 terraform.tfvars
 infra/aws/defectdojo/terraform.tfvars
+infra/aws/app-environments/terraform.tfvars
+infra/aws/app-environments/terraform.tfvars.example
+infra/aws/github-oidc/terraform.tfvars
+infra/aws/github-oidc/terraform.tfvars.example
