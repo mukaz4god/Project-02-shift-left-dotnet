@@ -1,0 +1,102 @@
+name: Environment Promotion Pipeline
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build Application Image
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: |
+          docker build -t vulnerable-dotnet-app:${{ github.sha }} ./app
+
+      - name: Save Docker image
+        run: |
+          docker save vulnerable-dotnet-app:${{ github.sha }} -o vulnerable-dotnet-app.tar
+
+      - name: Upload image artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: vulnerable-dotnet-app-image
+          path: vulnerable-dotnet-app.tar
+
+  deploy-dev:
+    name: Deploy to Dev
+    runs-on: ubuntu-latest
+    needs: build
+    environment: dev
+
+    steps:
+      - name: Download image artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: vulnerable-dotnet-app-image
+
+      - name: Load Docker image
+        run: |
+          docker load -i vulnerable-dotnet-app.tar
+
+      - name: Run Dev container
+        run: |
+          docker run -d --name app-dev -p 8081:8080 vulnerable-dotnet-app:${{ github.sha }}
+          sleep 10
+
+      - name: Dev smoke test
+        run: |
+          curl -f http://localhost:8081 || exit 1
+
+  deploy-test:
+    name: Deploy to Test
+    runs-on: ubuntu-latest
+    needs: deploy-dev
+    environment: test
+
+    steps:
+      - name: Download image artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: vulnerable-dotnet-app-image
+
+      - name: Load Docker image
+        run: |
+          docker load -i vulnerable-dotnet-app.tar
+
+      - name: Run Test container
+        run: |
+          docker run -d --name app-test -p 8082:8080 vulnerable-dotnet-app:${{ github.sha }}
+          sleep 10
+
+      - name: Test environment validation
+        run: |
+          curl -f http://localhost:8082 || exit 1
+
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    needs: deploy-test
+    environment: staging
+
+    steps:
+      - name: Download image artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: vulnerable-dotnet-app-image
+
+      - name: Load Docker image
+        run: |
+          docker load -i vulnerable-dotnet-app.tar
+
+      - name: Run Staging container
+        run: |
+          docker run -d --name app-staging -p 8083:8080 vulnerable-dotnet-app:${{ github.sha }}
+          sleep 10
+
+      - name: Staging smoke test
+        run: |
+          curl -f http://localhost:8083 || exit 1
