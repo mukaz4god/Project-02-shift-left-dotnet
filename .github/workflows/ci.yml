@@ -121,5 +121,8 @@ jobs:
             -F "verified=true"
 
   aws-environment-promotion:
+    permissions:
+      id-token: write
+      contents: read
     uses: ./.github/workflows/aws-environment-promotion.yml
     needs: defectdojo-import
