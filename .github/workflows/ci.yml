@@ -119,3 +119,7 @@ jobs:
             -F "file=@trivy-results/trivy-results.json" \
             -F "active=true" \
             -F "verified=true"
+
+  aws-environment-promotion:
+    uses: ./.github/workflows/aws-environment-promotion.yml
+    needs: defectdojo-import
