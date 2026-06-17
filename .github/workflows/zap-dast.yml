@@ -17,6 +17,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Prepare ZAP report directory
+        run: |
+          mkdir -p zap-reports
+          chmod 777 zap-reports
+
       - name: Run OWASP ZAP Baseline Scan
         run: |
               docker run --rm \
@@ -32,21 +37,20 @@ jobs:
                 -a \
                 || true
 
+      - name: Debug ZAP reports
+        run: |
+              ls -la zap-reports
+
       - name: Upload ZAP Report
         uses: actions/upload-artifact@v4
         with:
             name: zap-report
             path: |
-                  report_html.html
-                  report_json.json
-                  report_xml.xml
-                  report_md.md
+                  zap-reports/report_html.html
+                  zap-reports/report_json.json
+                  zap-reports/report_xml.xml
+                  zap-reports/report_md.md
 
-      - name: Debug ZAP reports
-        run: |
-          pwd
-          ls -la
-          find . -maxdepth 2 -type f
 
       - name: Import ZAP XML into DefectDojo
         run: |
@@ -56,7 +60,7 @@ jobs:
             -F "product_name=Project 2 - OWASP .NET App" \
             -F "engagement_name=Shift-Left Security Assessment" \
             -F "scan_type=ZAP Scan" \
-            -F "file=@report_xml.xml" \
+            -F "file=@zap-reports/report_xml.xml" \
             -F "active=true" \
             -F "verified=true"
 
