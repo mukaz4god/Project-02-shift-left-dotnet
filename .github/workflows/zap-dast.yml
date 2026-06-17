@@ -5,7 +5,6 @@ on:
 
 jobs:
   zap-scan:
-
     runs-on: ubuntu-latest
 
     permissions:
@@ -13,7 +12,6 @@ jobs:
       contents: read
 
     steps:
-
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -24,33 +22,28 @@ jobs:
 
       - name: Run OWASP ZAP Baseline Scan
         run: |
-              docker run --rm \
-                -v "${{ github.workspace }}:/zap/wrk/:rw" \
-                --network host \
-                ghcr.io/zaproxy/zaproxy:stable \
-                zap-baseline.py \
-                -t "http://${{ secrets.STAGING_HOST }}:8080" \
-                -J report_json.json \
-                -w report_md.md \
-                -r report_html.html \
-                -x report_xml.xml \
-                -a \
-                || true
+          docker run --rm \
+            -v "${{ github.workspace }}:/zap/wrk/:rw" \
+            --network host \
+            ghcr.io/zaproxy/zaproxy:stable \
+            zap-baseline.py \
+            -t "http://${{ secrets.STAGING_HOST }}:8080" \
+            -J zap-reports/report_json.json \
+            -w zap-reports/report_md.md \
+            -r zap-reports/report_html.html \
+            -x zap-reports/report_xml.xml \
+            -a \
+            || true
 
       - name: Debug ZAP reports
         run: |
-              ls -la zap-reports
+          ls -la zap-reports
 
       - name: Upload ZAP Report
         uses: actions/upload-artifact@v4
         with:
-            name: zap-report
-            path: |
-                  zap-reports/report_html.html
-                  zap-reports/report_json.json
-                  zap-reports/report_xml.xml
-                  zap-reports/report_md.md
-
+          name: zap-report
+          path: zap-reports/
 
       - name: Import ZAP XML into DefectDojo
         run: |
@@ -60,10 +53,9 @@ jobs:
             -F "product_name=Project 2 - OWASP .NET App" \
             -F "engagement_name=Shift-Left Security Assessment" \
             -F "scan_type=ZAP Scan" \
-            -F "file=@zap-reports/report_xml.xml" \
+            -F "file=@${{ github.workspace }}/zap-reports/report_xml.xml" \
             -F "active=true" \
             -F "verified=true"
-
 
       # - name: Run OWASP ZAP Full Scan
       #   uses: zaproxy/action-full-scan@v0.13.0
