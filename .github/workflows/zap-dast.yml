@@ -17,46 +17,58 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Run OWASP ZAP Full Scan
-        uses: zaproxy/action-full-scan@v0.13.0
-        with:
-          target: 'http://${{ secrets.STAGING_HOST }}:8080'
-          rules_file_name: '.zap/rules.tsv'
-          cmd_options: '-a'
-          allow_issue_writing: false
+      - name: Run OWASP ZAP Baseline Scan
+        run: |
+              docker run --rm \
+                -v "${{ github.workspace }}:/zap/wrk/:rw" \
+                --network host \
+                ghcr.io/zaproxy/zaproxy:stable \
+                zap-baseline.py \
+                -t "http://${{ secrets.STAGING_HOST }}:8080" \
+                -J report_json.json \
+                -w report_md.md \
+                -r report_html.html \
+                -x report_xml.xml \
+                -a \
+                || true
 
       - name: Upload ZAP Report
         uses: actions/upload-artifact@v4
         with:
-          name: zap-report
-          path: |
-            report_html.html
-            report_json.json
-            report_xml.xml
-            report_md.md
+            name: zap-report
+            path: |
+                  report_html.html
+                  report_json.json
+                  report_xml.xml
+                  report_md.md
+
+      - name: Import ZAP XML into DefectDojo
+        run: |
+          curl -i -X POST \
+            "${{ secrets.DEFECTDOJO_URL }}/api/v2/import-scan/" \
+            -H "Authorization: Token ${{ secrets.DEFECTDOJO_API_KEY }}" \
+            -F "product_name=Project 2 - OWASP .NET App" \
+            -F "engagement_name=Shift-Left Security Assessment" \
+            -F "scan_type=ZAP Scan" \
+            -F "file=@report_xml.xml" \
+            -F "active=true" \
+            -F "verified=true"
 
 
-# - name: Run OWASP ZAP Baseline Scan
-#         run: |
-#           docker run --rm \
-#             -v "${{ github.workspace }}:/zap/wrk/:rw" \
-#             --network host \
-#             ghcr.io/zaproxy/zaproxy:stable \
-#             zap-baseline.py \
-#             -t "http://${{ secrets.STAGING_HOST }}:8080" \
-#             -J report_json.json \
-#             -w report_md.md \
-#             -r report_html.html \
-#             -x report_xml.xml \
-#             -a \
-#             || true
+      # - name: Run OWASP ZAP Full Scan
+      #   uses: zaproxy/action-full-scan@v0.13.0
+      #   with:
+      #     target: 'http://${{ secrets.STAGING_HOST }}:8080'
+      #     rules_file_name: '.zap/rules.tsv'
+      #     cmd_options: '-a'
+      #     allow_issue_writing: false
 
-#       - name: Upload ZAP Report
-#         uses: actions/upload-artifact@v4
-#         with:
-#           name: zap-report
-#           path: |
-#             report_html.html
-#             report_json.json
-#             report_xml.xml
-#             report_md.md
+      # - name: Upload ZAP Report
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: zap-report
+      #     path: |
+      #       report_html.html
+      #       report_json.json
+      #       report_xml.xml
+      #       report_md.md
