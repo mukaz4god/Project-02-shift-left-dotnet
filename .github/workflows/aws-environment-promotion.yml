@@ -72,10 +72,16 @@ jobs:
             ]' \
             --region ${{ secrets.AWS_REGION }}
 
-      - name: Smoke Test Dev
+      - name: Smoke Test Dev via SSM
         run: |
-          sleep 30
-          curl -f http://${{ secrets.DEV_HOST }}:8080
+            aws ssm send-command \
+            --document-name "AWS-RunShellScript" \
+            --targets "Key=tag:Name,Values=project2-dotnet-dev" \
+            --parameters 'commands=[
+              "sleep 10",
+              "curl -f http://localhost:8080"
+            ]' \
+            --region ${{ secrets.AWS_REGION }}
 
   deploy-test:
     runs-on: ubuntu-latest
@@ -105,10 +111,16 @@ jobs:
             ]' \
             --region ${{ secrets.AWS_REGION }}
 
-      - name: Smoke Test Test
+      - name: Smoke Test in Test via SSM
         run: |
-          sleep 30
-          curl -f http://${{ secrets.TEST_HOST }}:8080
+            aws ssm send-command \
+            --document-name "AWS-RunShellScript" \
+            --targets "Key=tag:Name,Values=project2-dotnet-dev" \
+            --parameters 'commands=[
+              "sleep 10",
+              "curl -f http://localhost:8080"
+            ]' \
+            --region ${{ secrets.AWS_REGION }}
 
   deploy-staging:
     runs-on: ubuntu-latest
@@ -138,10 +150,16 @@ jobs:
             ]' \
             --region ${{ secrets.AWS_REGION }}
 
-      - name: Smoke Test Staging
+      - name: Smoke Test in Staging via SSM
         run: |
-          sleep 30
-          curl -f http://${{ secrets.STAGING_HOST }}:8080
+            aws ssm send-command \
+            --document-name "AWS-RunShellScript" \
+            --targets "Key=tag:Name,Values=project2-dotnet-staging" \
+            --parameters 'commands=[
+              "sleep 10",
+              "curl -f http://localhost:8080"
+            ]' \
+            --region ${{ secrets.AWS_REGION }}
 
   deploy-prod:
     runs-on: ubuntu-latest
@@ -171,7 +189,13 @@ jobs:
             ]' \
             --region ${{ secrets.AWS_REGION }}
 
-      - name: Smoke Test Production
+      - name: Smoke Test in Production via SSM
         run: |
-          sleep 30
-          curl -f http://${{ secrets.PROD_HOST }}:8080
+            aws ssm send-command \
+            --document-name "AWS-RunShellScript" \
+            --targets "Key=tag:Name,Values=project2-dotnet-prod" \
+            --parameters 'commands=[
+              "sleep 10",
+              "curl -f http://localhost:8080"
+            ]' \
+            --region ${{ secrets.AWS_REGION }}
