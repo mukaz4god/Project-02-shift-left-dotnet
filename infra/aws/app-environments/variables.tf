@@ -13,3 +13,7 @@ variable "allowed_admin_cidr" {
 variable "key_name" {
   type = string
 }
+
+variable "alb_subnet_ids" {
+  type = list(string)
+}

@@ -8,3 +8,7 @@ output "environment_public_ips" {
     env => instance.public_ip
   }
 }
+
+output "staging_alb_dns_name" {
+  value = aws_lb.staging.dns_name
+}
