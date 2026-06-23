@@ -125,4 +125,4 @@ jobs:
       id-token: write
       contents: read
     uses: ./.github/workflows/aws-environment-promotion.yml
-    needs: defectdojo-import
+   # needs: defectdojo-import
