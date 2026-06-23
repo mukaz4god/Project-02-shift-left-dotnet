@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("vulnerable_asp_net_core")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+4ebc91cfc910c7e883a3aaa0e17223c57b9d6349")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+aef026e392fb5f1a311c01b3266f634a00520f1e")]
 [assembly: System.Reflection.AssemblyProductAttribute("vulnerable_asp_net_core")]
 [assembly: System.Reflection.AssemblyTitleAttribute("vulnerable_asp_net_core")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
