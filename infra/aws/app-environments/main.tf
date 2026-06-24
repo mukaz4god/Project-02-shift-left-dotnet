@@ -232,6 +232,16 @@ resource "aws_iam_role_policy_attachment" "ec2_attach" {
   policy_arn = aws_iam_policy.ec2_policy.arn
 }
 
+resource "aws_iam_role_policy_attachment" "ssm_managed_instance_core" {
+  role       = aws_iam_role.ec2_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+}
+
+resource "aws_iam_role_policy_attachment" "cloudwatch_agent_server_policy" {
+  role       = aws_iam_role.ec2_role.name
+  policy_arn = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
+}
+
 resource "aws_iam_instance_profile" "ec2_profile" {
   name = "${var.project_name}-app-profile"
   role = aws_iam_role.ec2_role.name
@@ -250,11 +260,13 @@ resource "aws_instance" "app" {
     #!/bin/bash
     set -e
     yum update -y
-    yum install -y docker awscli amazon-ssm-agent
+    yum install -y docker awscli amazon-ssm-agent amazon-cloudwatch-agent
     systemctl enable docker
     systemctl start docker
     systemctl enable amazon-ssm-agent
     systemctl start amazon-ssm-agent
+    systemctl enable amazon-cloudwatch-agent
+    systemctl start amazon-cloudwatch-agent
     usermod -aG docker ec2-user
   EOF
 
@@ -341,4 +353,90 @@ resource "aws_lb_listener" "https" {
     type             = "forward"
     target_group_arn = aws_lb_target_group.staging.arn
   }
+}
+
+resource "aws_cloudwatch_metric_alarm" "high_cpu_prod" {
+  alarm_name          = "project2-prod-high-cpu"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 2
+  metric_name         = "CPUUtilization"
+  namespace           = "AWS/EC2"
+  period              = 300
+  statistic           = "Average"
+  threshold           = 80
+
+  dimensions = {
+    InstanceId = aws_instance.app["prod"].id
+  }
+
+  alarm_description  = "Production CPU utilization above 80%"
+  treat_missing_data = "notBreaching"
+}
+
+resource "aws_cloudwatch_metric_alarm" "high_memory_prod" {
+  alarm_name          = "project2-prod-high-memory"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 2
+  metric_name         = "mem_used_percent"
+  namespace           = "Project2/DotNetApp"
+  period              = 300
+  statistic           = "Average"
+  threshold           = 80
+
+  dimensions = {
+    InstanceId = aws_instance.app["prod"].id
+  }
+
+  alarm_description  = "Production memory utilization above 80%"
+  treat_missing_data = "notBreaching"
+}
+
+resource "aws_cloudwatch_metric_alarm" "disk_usage_prod" {
+  alarm_name          = "project2-prod-disk-usage"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 2
+  metric_name         = "used_percent"
+  namespace           = "Project2/DotNetApp"
+  period              = 300
+  statistic           = "Average"
+  threshold           = 80
+
+  dimensions = {
+    InstanceId = aws_instance.app["prod"].id
+    path       = "/"
+  }
+
+  alarm_description  = "Production disk usage above 80%"
+  treat_missing_data = "notBreaching"
+}
+
+resource "aws_cloudwatch_dashboard" "project2" {
+  dashboard_name = "Project2-DotNetApplication-Operations"
+
+  dashboard_body = jsonencode({
+    widgets = [
+      {
+        type   = "metric"
+        x      = 0
+        y      = 0
+        width  = 12
+        height = 6
+
+        properties = {
+          title = "EC2 CPU Utilization"
+
+          metrics = [
+            ["AWS/EC2", "CPUUtilization", "InstanceId", aws_instance.app["dev"].id],
+            [".", ".", "InstanceId", aws_instance.app["test"].id],
+            [".", ".", "InstanceId", aws_instance.app["staging"].id],
+            [".", ".", "InstanceId", aws_instance.app["prod"].id]
+          ]
+
+          period = 300
+          stat   = "Average"
+          region = "us-east-1"
+        }
+      }
+    ]
+  })
 }
